@@ -32,10 +32,13 @@ export default function AuroraBackground() {
 
     let renderer: Renderer;
     try {
+      // The aurora is soft noise, so it is drawn at a fraction of screen resolution and
+      // stretched by CSS. Full-res cost ~35 noise lookups per pixel per frame and was
+      // the bulk of main-thread time on phones.
       renderer = new Renderer({
         alpha: true,
         antialias: false,
-        dpr: Math.min(window.devicePixelRatio || 1, window.innerWidth < 768 ? 1 : 1.5),
+        dpr: window.innerWidth < 768 ? 0.35 : 0.5,
       });
     } catch (e) {
       console.warn("[Aurora] WebGL init failed -> static fallback", e);
@@ -94,7 +97,7 @@ export default function AuroraBackground() {
       float fbm(vec2 p){
         float v = 0.0;
         float a = 0.5;
-        for(int i = 0; i < 5; i++){
+        for(int i = 0; i < 4; i++){
           v += a * noise(p);
           p *= 2.0;
           a *= 0.5;
@@ -233,28 +236,40 @@ export default function AuroraBackground() {
 
     let raf = 0;
     let running = false;
+    let last = 0;
     const start = performance.now();
+    let ready = false;
     const loop = () => {
-      if (running || !visible || document.hidden) return;
+      if (!ready || running || !visible || document.hidden) return;
       running = true;
       const frame = (now: number) => {
         if (!visible || document.hidden) {
           running = false;
           return;
         }
+        raf = requestAnimationFrame(frame);
+        // the flow is slow, so 30fps looks the same and halves the work
+        if (now - last < 33) return;
+        last = now;
         program.uniforms.uTime.value = (now - start) / 1000;
         // lerp mouse toward target for smoothness
         const m = program.uniforms.uMouse.value as Vec2;
         m.x += (target.x - m.x) * 0.05;
         m.y += (target.y - m.y) * 0.05;
         renderer.render({ scene: mesh });
-        raf = requestAnimationFrame(frame);
       };
       raf = requestAnimationFrame(frame);
     };
-    loop();
+    // start after the page has painted, so the shader compile doesn't compete with it
+    const idle = window.requestIdleCallback ?? ((cb: () => void) => window.setTimeout(cb, 200));
+    const cancelIdle = window.cancelIdleCallback ?? window.clearTimeout;
+    const idleId = idle(() => {
+      ready = true;
+      loop();
+    });
 
     return () => {
+      cancelIdle(idleId);
       cancelAnimationFrame(raf);
       io.disconnect();
       themeObserver.disconnect();

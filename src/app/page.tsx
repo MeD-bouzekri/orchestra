@@ -1,8 +1,3 @@
-"use client";
-
-import { useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import SplashScreen from "@/components/SplashScreen";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Timeline from "@/components/Timeline";
@@ -12,56 +7,37 @@ import Pricing from "@/components/Pricing";
 import CTAForm from "@/components/CTAForm";
 import Footer from "@/components/Footer";
 
+// The page is visible from the first paint. The old splash screen held the whole page
+// at opacity 0 behind a simulated progress bar for about two seconds, which was most
+// of the slow Largest Contentful Paint.
 export default function Home() {
-  const [showSplash, setShowSplash] = useState(true);
-
   return (
     <>
-      {/* Brand Splash Screen Loading Overlay */}
-      <AnimatePresence mode="wait">
-        {showSplash && (
-          <SplashScreen key="splash" onComplete={() => setShowSplash(false)} />
-        )}
-      </AnimatePresence>
+      <Navbar showSplash={false} />
 
-      {/* Sticky Header — always visible so the logo can perform shared transition */}
-      <Navbar showSplash={showSplash} />
+      {/* Main Experience Layout */}
+      <main className="flex-1">
+        {/* Hero Section + Interactive Routing simulator */}
+        <Hero />
 
-      {/* Main Page Content — pulls back into view as the splash zooms out.
-          Starts slightly scaled-down + faded; settles to 1 when splash ends. */}
-      <motion.div
-        initial={false}
-        animate={{
-          opacity: showSplash ? 0 : 1,
-          scale: showSplash ? 0.96 : 1,
-        }}
-        transition={{ duration: 0.7, ease: [0.7, 0, 0.3, 1], delay: showSplash ? 0 : 0.1 }}
-        style={{ transformOrigin: "center top" }}
-      >
-        {/* Main Experience Layout */}
-        <main className="flex-1">
-          {/* Hero Section + Interactive Routing simulator */}
-          <Hero />
+        {/* Sprint Timeline Features Showcase */}
+        <Timeline />
 
-          {/* Sprint Timeline Features Showcase */}
-          <Timeline />
+        {/* Feature Deep Dive Grid */}
+        <FeatureGrid />
 
-          {/* Feature Deep Dive Grid */}
-          <FeatureGrid />
+        {/* Treasury Liquidity Live visualizer */}
+        <LiquidityVisualizer />
 
-          {/* Treasury Liquidity Live visualizer */}
-          <LiquidityVisualizer />
+        {/* Pricing Tier and Estimation Calculator */}
+        <Pricing />
 
-          {/* Pricing Tier and Estimation Calculator */}
-          <Pricing />
+        {/* Access Sandbox CTA */}
+        <CTAForm />
+      </main>
 
-          {/* Access Sandbox CTA */}
-          <CTAForm />
-        </main>
-
-        {/* Sleek Footnote and Links */}
-        <Footer />
-      </motion.div>
+      {/* Sleek Footnote and Links */}
+      <Footer />
     </>
   );
 }

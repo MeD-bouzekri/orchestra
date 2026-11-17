@@ -20,6 +20,16 @@ export default function PersistentVisual() {
   const { scrollY } = useScroll();
   const [vh, setVh] = useState(0);
   const [isDark, setIsDark] = useState(true);
+  // the layer is hidden below lg, so phones never start its WebGL scene at all
+  const [wide, setWide] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const syncWide = () => setWide(mq.matches);
+    syncWide();
+    mq.addEventListener("change", syncWide);
+    return () => mq.removeEventListener("change", syncWide);
+  }, []);
 
   useEffect(() => {
     const set = () => setVh(window.innerHeight);
@@ -55,9 +65,7 @@ export default function PersistentVisual() {
       className="fixed inset-y-0 right-0 z-[1] hidden w-1/2 items-center justify-center pointer-events-none lg:flex"
       aria-hidden="true"
     >
-      <div className="w-full max-w-xl px-8">
-        <HeroVisual />
-      </div>
+      <div className="w-full max-w-xl px-8">{wide && <HeroVisual />}</div>
     </motion.div>
   );
 }

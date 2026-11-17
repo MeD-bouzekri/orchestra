@@ -83,8 +83,10 @@ export default function Hero() {
           {/* Text Content Column (Left 6 columns) */}
           <div className="lg:col-span-6 space-y-6 text-center lg:text-left flex flex-col items-center lg:items-start">
             {/* Headline — colored phrase typed dynamically */}
+            {/* headline and intro slide in without starting invisible, so the browser
+                can paint them (and count them for LCP) before JavaScript runs */}
             <motion.h1
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
               className="text-4xl sm:text-5xl md:text-6xl font-black text-text-primary leading-[1.1] tracking-tight"
@@ -103,7 +105,7 @@ export default function Hero() {
 
             {/* Subheading — professional, balanced measure */}
             <motion.p
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
               className="text-text-secondary font-sans text-base sm:text-lg leading-relaxed max-w-xl font-normal tracking-[-0.005em] text-pretty mx-auto lg:mx-0"

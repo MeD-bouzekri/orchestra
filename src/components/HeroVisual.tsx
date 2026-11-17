@@ -53,7 +53,7 @@ export default function HeroVisual() {
       renderer = new Renderer({
         alpha: true,
         antialias: true,
-        dpr: Math.min(window.devicePixelRatio || 1, 2),
+        dpr: Math.min(window.devicePixelRatio || 1, 1.5),
       });
     } catch {
       setFallback(true);
