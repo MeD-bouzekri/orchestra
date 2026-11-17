@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "ship": "next build && git push",
+    "deploy": "npx vercel@latest --prod"
   },
   "dependencies": {
     "clsx": "^2.1.1",
